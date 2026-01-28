@@ -1,0 +1,42 @@
+services:
+  php_fpm:
+    build:
+      context: ./docker/php
+    container_name: vibecode_php_fpm
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+    environment:
+      APP_ENV: local
+    networks:
+      - vibecode
+
+  backend:
+    image: nginx:1.25-alpine
+    container_name: vibecode_backend
+    depends_on:
+      - php_fpm
+    ports:
+      - "8201:80"
+    volumes:
+      - ./backend:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - vibecode
+
+  frontend:
+    build:
+      context: ./docker/node
+    container_name: vibecode_frontend
+    working_dir: /app
+    ports:
+      - "8200:8200"
+    volumes:
+      - ./frontend:/app
+    command: sh -lc "if [ -f package.json ]; then npm install; npm run dev -- --hostname 0.0.0.0 --port 8200; else echo 'Run ./frontend-setup.sh first.'; sleep 3600; fi"
+    networks:
+      - vibecode
+
+networks:
+  vibecode:
+    driver: bridge
