@@ -38,7 +38,7 @@ export default function LoginForm({
           Парола
           <input
             className="rounded-xl border border-slate-800 bg-slate-900/60 px-3 py-2 text-sm text-slate-100 outline-none ring-0 focus:border-slate-500"
-            type="password"
+            
             value={password}
             onChange={(event) => onPasswordChange(event.target.value)}
             required

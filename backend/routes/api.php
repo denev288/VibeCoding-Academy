@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\TagController;
+use App\Http\Controllers\Api\ToolController;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,3 +39,17 @@ Route::post('/logout', function (Request $request) {
 
     return response()->noContent();
 });
+
+Route::get('/roles', [RoleController::class, 'index']);
+
+Route::get('/categories', [CategoryController::class, 'index']);
+Route::post('/categories', [CategoryController::class, 'store'])->middleware('auth:sanctum');
+
+Route::get('/tags', [TagController::class, 'index']);
+Route::post('/tags', [TagController::class, 'store'])->middleware('auth:sanctum');
+
+Route::get('/tools', [ToolController::class, 'index'])->middleware('auth:sanctum');
+Route::get('/tools/{tool}', [ToolController::class, 'show'])->middleware('auth:sanctum');
+Route::post('/tools', [ToolController::class, 'store'])->middleware('auth:sanctum');
+Route::put('/tools/{tool}', [ToolController::class, 'update'])->middleware('auth:sanctum');
+Route::delete('/tools/{tool}', [ToolController::class, 'destroy'])->middleware('auth:sanctum');

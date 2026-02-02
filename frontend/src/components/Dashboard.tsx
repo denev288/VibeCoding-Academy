@@ -1,11 +1,13 @@
 import type { User } from "@/types/user";
+import type { Tool } from "@/features/tools/types";
+import ToolList from "@/features/tools/components/ToolList";
 
 type DashboardProps = {
   user: User;
-  roleActions: Record<string, string[]>;
+  tools: Tool[];
 };
 
-export default function Dashboard({ user, roleActions }: DashboardProps) {
+export default function Dashboard({ user, tools }: DashboardProps) {
   return (
     <>
       <section className="rounded-3xl border border-slate-800/70 bg-slate-950/70 p-8 shadow-2xl shadow-black/40">
@@ -27,27 +29,7 @@ export default function Dashboard({ user, roleActions }: DashboardProps) {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-slate-800/70 bg-slate-950/70 p-6">
-        <h3 className="text-lg font-semibold">Бързи действия</h3>
-        <p className="mt-2 text-sm text-slate-400">
-          Видими според ролята ти.
-        </p>
-        <div className="mt-5 grid gap-3">
-          {(user.role && roleActions[user.role])?.map((label) => (
-            <button
-              key={label}
-              className="w-full rounded-2xl border border-slate-800 bg-slate-900/60 px-4 py-3 text-left text-sm text-slate-200 transition hover:border-slate-500 hover:bg-slate-900"
-              type="button"
-            >
-              {label}
-            </button>
-          )) ?? (
-            <p className="text-sm text-slate-400">
-              Няма дефинирани действия за тази роля.
-            </p>
-          )}
-        </div>
-      </section>
+      <ToolList tools={tools} title="Инструменти добавени от мен" />
     </>
   );
 }

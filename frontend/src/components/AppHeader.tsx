@@ -1,9 +1,16 @@
+import Link from "next/link";
+
 type AppHeaderProps = {
   isAuthenticated: boolean;
   onLogout: () => void;
+  links?: { label: string; href: string }[];
 };
 
-export default function AppHeader({ isAuthenticated, onLogout }: AppHeaderProps) {
+export default function AppHeader({
+  isAuthenticated,
+  onLogout,
+  links = [],
+}: AppHeaderProps) {
   return (
     <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-8">
       <div className="flex items-center gap-3">
@@ -18,6 +25,19 @@ export default function AppHeader({ isAuthenticated, onLogout }: AppHeaderProps)
             Frontend Workspace
           </h1>
         </div>
+        {links.length ? (
+          <nav className="ml-6 hidden items-center gap-4 text-sm text-slate-300 sm:flex">
+            {links.map((link) => (
+              <Link
+                key={link.href}
+                className="transition hover:text-slate-100"
+                href={link.href}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        ) : null}
       </div>
       {isAuthenticated ? (
         <button
