@@ -7,8 +7,8 @@ import LoginForm from "@/components/LoginForm";
 import { useAuthSession } from "@/hooks/useAuthSession";
 
 export default function Home() {
-  const [email, setEmail] = useState("ivan@admin.local");
-  const [password, setPassword] = useState("password");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const { user, status, error, login, logout } = useAuthSession();
 
   const roleActions: Record<string, string[]> = {

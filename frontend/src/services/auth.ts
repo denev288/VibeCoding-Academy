@@ -24,7 +24,7 @@ export const fetchUser = async (): Promise<User | null> => {
 
 export const login = async (payload: { email: string; password: string }) => {
   const xsrfToken = readXsrfToken();
-  const res = await fetch(`${API_BASE}/login`, {
+  const res = await fetch(`${API_BASE}/api/login`, {
     method: "POST",
     credentials: "include",
     redirect: "manual",
@@ -41,7 +41,7 @@ export const login = async (payload: { email: string; password: string }) => {
 };
 
 export const logout = async () => {
-  await fetch(`${API_BASE}/logout`, {
+  await fetch(`${API_BASE}/api/logout`, {
     method: "POST",
     credentials: "include",
     headers: { Accept: "application/json" },
