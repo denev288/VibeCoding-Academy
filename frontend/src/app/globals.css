@@ -3,6 +3,29 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --app-bg: #f7f8fb;
+  --app-bg-gradient: radial-gradient(circle at top, #e5ebf6, #f7f8fb 55%, #ffffff);
+  --app-surface: rgba(255, 255, 255, 0.9);
+  --app-panel: rgba(255, 255, 255, 0.7);
+  --app-border: rgba(148, 163, 184, 0.5);
+  --app-text: #0f172a;
+  --app-muted: #475569;
+  --app-subtle: #64748b;
+  --accent: #10b981;
+}
+
+[data-theme="dark"] {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --app-bg: #07090f;
+  --app-bg-gradient: radial-gradient(circle at top, #18212f, #0b0f1a 55%, #07090f);
+  --app-surface: rgba(2, 6, 23, 0.7);
+  --app-panel: rgba(15, 23, 42, 0.6);
+  --app-border: rgba(51, 65, 85, 0.7);
+  --app-text: #f8fafc;
+  --app-muted: #cbd5f5;
+  --app-subtle: #94a3b8;
+  --accent: lab(64% -73.65 38.23);
 }
 
 @theme inline {
@@ -12,15 +35,53 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.app-shell {
+  background: var(--app-bg-gradient);
+  color: var(--app-text);
+}
+
+.app-surface {
+  background: var(--app-surface);
+}
+
+.app-panel {
+  background: var(--app-panel);
+}
+
+.app-border {
+  border-color: var(--app-border);
+}
+
+.text-primary {
+  color: var(--app-text);
+}
+
+.text-muted {
+  color: var(--app-muted);
+}
+
+.text-subtle {
+  color: var(--app-subtle);
+}
+
+.accent-text {
+  color: var(--accent);
+}
+
+.accent-border {
+  border-color: var(--accent);
+}
+
+.accent-bg {
+  background: var(--accent);
+}
+
+.accent-soft {
+  background: color-mix(in oklab, var(--accent) 15%, transparent);
 }

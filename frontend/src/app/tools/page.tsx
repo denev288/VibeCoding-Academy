@@ -54,7 +54,11 @@ export default function ToolsPage() {
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [formStatus, setFormStatus] = useState<string>("");
   const [editingToolId, setEditingToolId] = useState<number | null>(null);
-  const [activeTab, setActiveTab] = useState<"list" | "form">("list");
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [pendingDelete, setPendingDelete] = useState<Tool | null>(null);
+  const [toasts, setToasts] = useState<
+    { id: string; message: string; tone: "success" | "error" }[]
+  >([]);
   const userId = user?.id ?? null;
 
   useEffect(() => {
@@ -127,15 +131,19 @@ export default function ToolsPage() {
       fetchTools(filters).then(setTools).catch(() => setTools([]));
       fetchCategories().then(setCategories).catch(() => setCategories([]));
       fetchTags().then(setTags).catch(() => setTags([]));
-      setActiveTab("list");
+      setIsModalOpen(false);
+      pushToast(
+        editingToolId ? "Инструментът е обновен." : "Инструментът е добавен.",
+        "success"
+      );
     } else {
       setFormStatus(result.error ?? "Грешка при запис.");
+      pushToast(result.error ?? "Грешка при запис.", "error");
     }
   };
 
   const handleEdit = (tool: Tool) => {
     if (!user || tool.created_by !== user.id) return;
-    setActiveTab("form");
     setEditingToolId(tool.id);
     setForm({
       name: tool.name ?? "",
@@ -151,28 +159,51 @@ export default function ToolsPage() {
     setSelectedCategoryIds(tool.categories?.map((item) => item.id) ?? []);
     setSelectedRoleKeys(tool.role_assignments?.map((item) => item.role) ?? []);
     setSelectedTagIds(tool.tags?.map((item) => item.id) ?? []);
+    setIsModalOpen(true);
   };
 
   const handleDelete = async (tool: Tool) => {
     if (!user || tool.created_by !== user.id) return;
-    const confirmed = window.confirm(`Изтриване на "${tool.name}"?`);
-    if (!confirmed) return;
     const result = await deleteTool(tool.id);
     if (result.ok) {
       fetchTools(filters).then(setTools).catch(() => setTools([]));
+      pushToast("Инструментът е изтрит.", "success");
     } else {
       setFormStatus(result.error ?? "Грешка при изтриване.");
+      pushToast(result.error ?? "Грешка при изтриване.", "error");
     }
   };
 
+  const handleDeleteRequest = (tool: Tool) => {
+    if (!user || tool.created_by !== user.id) return;
+    setPendingDelete(tool);
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return;
+    await handleDelete(pendingDelete);
+    setPendingDelete(null);
+  };
+
+  const pushToast = (message: string, tone: "success" | "error") => {
+    const id = crypto.randomUUID();
+    setToasts((prev) => [...prev, { id, message, tone }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    }, 3500);
+  };
+
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_#18212f,_#0b0f1a_55%,_#07090f)] text-slate-100">
+    <div className="min-h-screen app-shell">
       <AppHeader
         isAuthenticated={Boolean(user)}
         onLogout={() => {
           logout();
           router.replace("/");
         }}
+        userName={user?.name}
+        userEmail={user?.email}
+        userRole={user?.role}
         links={
           user
             ? [
@@ -185,7 +216,7 @@ export default function ToolsPage() {
 
       <main className="mx-auto grid w-full max-w-6xl gap-8 px-6 pb-16 pt-4">
         {isChecking ? (
-          <section className="rounded-3xl border border-slate-800/70 bg-slate-950/70 p-6">
+          <section className="rounded-3xl border app-border app-surface p-6">
             <Loader label="Проверка на сесията..." />
           </section>
         ) : !user ? (
@@ -203,101 +234,180 @@ export default function ToolsPage() {
           />
         ) : (
           <>
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                className={`rounded-full border px-4 py-2 text-sm transition ${
-                  activeTab === "list"
-                    ? "border-emerald-400/70 bg-emerald-400/10 text-emerald-200"
-                    : "border-slate-800 bg-slate-900/60 text-slate-300 hover:border-slate-500"
-                }`}
-                onClick={() => setActiveTab("list")}
-              >
-                Съществуващи инструменти
-              </button>
-              <button
-                type="button"
-                className={`rounded-full border px-4 py-2 text-sm transition ${
-                  activeTab === "form"
-                    ? "border-emerald-400/70 bg-emerald-400/10 text-emerald-200"
-                    : "border-slate-800 bg-slate-900/60 text-slate-300 hover:border-slate-500"
-                }`}
-                onClick={() => {
-                  resetForm();
-                  setActiveTab("form");
-                }}
-              >
-                Добавяне на инструмент
-              </button>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-semibold">Инструменти</h2>
+                <p className="mt-1 text-sm text-subtle">
+                  Управлявай списъка с AI инструменти и добавяй нови.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  className="rounded-full accent-border accent-soft px-4 py-2 text-sm accent-text transition hover:border-[color:var(--accent)]"
+                  onClick={() => {
+                    resetForm();
+                    setEditingToolId(null);
+                    setIsModalOpen(false);
+                  }}
+                >
+                  Съществуващи инструменти
+                </button>
+                <button
+                  type="button"
+                  className="rounded-full border app-border app-panel px-4 py-2 text-sm text-primary transition hover:border-slate-500"
+                  onClick={() => {
+                    resetForm();
+                    setEditingToolId(null);
+                    setIsModalOpen(true);
+                  }}
+                >
+                  Добавяне на инструмент
+                </button>
+              </div>
             </div>
 
-            {activeTab === "form" ? (
-              <>
-                <ToolForm
-                  mode={editingToolId ? "edit" : "create"}
-                  name={form.name}
-                  link={form.link}
-                  documentationUrl={form.documentationUrl}
-                  documentation={form.documentation}
-                  description={form.description}
-                  howToUse={form.howToUse}
-                  examples={form.examples}
-                  selectedCategoryIds={selectedCategoryIds}
-                  newCategory={form.newCategory}
-                  selectedRoleKeys={selectedRoleKeys}
-                  selectedTagIds={selectedTagIds}
-                  newTags={form.newTags}
-                  roles={roles}
-                  categories={categories}
-                  tags={tags}
-                  onChange={(field, value) =>
-                    setForm((prev) => ({ ...prev, [field]: value }))
-                  }
-                  onToggleRole={(role) =>
-                    setSelectedRoleKeys((prev) =>
-                      prev.includes(role)
-                        ? prev.filter((item) => item !== role)
-                        : [...prev, role]
-                    )
-                  }
-                  onToggleCategory={(id) =>
-                    setSelectedCategoryIds((prev) => toggleId(prev, id))
-                  }
-                  onToggleTag={(id) =>
-                    setSelectedTagIds((prev) => toggleId(prev, id))
-                  }
-                  onSubmit={handleSubmit}
-                  onCancel={resetForm}
-                />
-                {formStatus ? (
-                  <p className="text-sm text-slate-300">{formStatus}</p>
-                ) : null}
-              </>
-            ) : (
-              <>
-                <ToolFilters
-                  name={filters.name}
-                  role={filters.role}
-                  category={filters.category}
-                  tags={filters.tags}
-                  roles={roles}
-                  categories={categories}
-                  onChange={(field, value) =>
-                    setFilters((prev) => ({ ...prev, [field]: value }))
-                  }
-                  onApply={applyFilters}
-                />
-                <ToolList
-                  tools={tools}
-                  currentUserId={user?.id ?? null}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
-              </>
-            )}
+            <ToolFilters
+              name={filters.name}
+              role={filters.role}
+              category={filters.category}
+              tags={filters.tags}
+              roles={roles}
+              categories={categories}
+              onChange={(field, value) =>
+                setFilters((prev) => ({ ...prev, [field]: value }))
+              }
+              onApply={applyFilters}
+            />
+            <ToolList
+              tools={tools}
+              currentUserId={user?.id ?? null}
+              onEdit={handleEdit}
+              onDelete={handleDeleteRequest}
+            />
+
+            {isModalOpen ? (
+              <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 px-4 py-12 backdrop-blur-sm">
+                <div className="w-full max-w-4xl rounded-3xl border app-border app-surface p-6 shadow-2xl">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <h3 className="text-xl font-semibold text-primary">
+                        {editingToolId ? "Редакция на инструмент" : "Добави нов инструмент"}
+                      </h3>
+                      <p className="mt-1 text-xs text-subtle">
+                        Попълни нужните полета и запази.
+                      </p>
+                    </div>
+                    <button
+                      className="rounded-full border app-border app-panel px-4 py-2 text-xs text-primary hover:border-slate-400"
+                      type="button"
+                      onClick={() => {
+                        setIsModalOpen(false);
+                        resetForm();
+                      }}
+                    >
+                      Затвори
+                    </button>
+                  </div>
+
+                  <div className="mt-5">
+                    <ToolForm
+                      mode={editingToolId ? "edit" : "create"}
+                      name={form.name}
+                      link={form.link}
+                      documentationUrl={form.documentationUrl}
+                      documentation={form.documentation}
+                      description={form.description}
+                      howToUse={form.howToUse}
+                      examples={form.examples}
+                      selectedCategoryIds={selectedCategoryIds}
+                      newCategory={form.newCategory}
+                      selectedRoleKeys={selectedRoleKeys}
+                      selectedTagIds={selectedTagIds}
+                      newTags={form.newTags}
+                      roles={roles}
+                      categories={categories}
+                      tags={tags}
+                      onChange={(field, value) =>
+                        setForm((prev) => ({ ...prev, [field]: value }))
+                      }
+                      onToggleRole={(role) =>
+                        setSelectedRoleKeys((prev) =>
+                          prev.includes(role)
+                            ? prev.filter((item) => item !== role)
+                            : [...prev, role]
+                        )
+                      }
+                      onToggleCategory={(id) =>
+                        setSelectedCategoryIds((prev) => toggleId(prev, id))
+                      }
+                      onToggleTag={(id) =>
+                        setSelectedTagIds((prev) => toggleId(prev, id))
+                      }
+                      onSubmit={handleSubmit}
+                      onCancel={() => {
+                        setIsModalOpen(false);
+                        resetForm();
+                      }}
+                    />
+                    {formStatus ? (
+                      <p className="mt-3 text-sm text-muted">{formStatus}</p>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
+            {pendingDelete ? (
+              <div className="fixed inset-0 z-[55] flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
+                <div className="w-full max-w-md rounded-3xl border app-border app-surface p-6 shadow-2xl">
+                  <h3 className="text-lg font-semibold text-primary">
+                    Потвърди изтриване
+                  </h3>
+                  <p className="mt-2 text-sm text-muted">
+                    Сигурен ли си, че искаш да изтриеш{" "}
+                    <span className="font-semibold text-primary">
+                      {pendingDelete.name}
+                    </span>
+                    ?
+                  </p>
+                  <div className="mt-6 flex flex-wrap justify-end gap-3">
+                    <button
+                      className="rounded-full border app-border app-panel px-4 py-2 text-xs text-primary hover:border-slate-400"
+                      type="button"
+                      onClick={() => setPendingDelete(null)}
+                    >
+                      Откажи
+                    </button>
+                    <button
+                      className="rounded-full border border-rose-400/70 bg-rose-500/10 px-4 py-2 text-xs text-rose-200 hover:border-rose-300"
+                      type="button"
+                      onClick={confirmDelete}
+                    >
+                      Изтрий
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : null}
           </>
         )}
       </main>
+
+      <div className="pointer-events-none fixed bottom-6 right-6 z-[60] flex flex-col gap-3">
+        {toasts.map((toast) => (
+          <div
+            key={toast.id}
+            className={`pointer-events-auto w-[280px] rounded-2xl border px-4 py-3 text-sm shadow-xl ${
+              toast.tone === "success"
+                ? "accent-border accent-soft accent-text"
+                : "border-rose-400/50 bg-rose-400/10 text-rose-200"
+            }`}
+          >
+            {toast.message}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

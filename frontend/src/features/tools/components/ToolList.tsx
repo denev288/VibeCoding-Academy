@@ -18,25 +18,37 @@ export default function ToolList({
   const showActions = Boolean(onEdit || onDelete);
 
   return (
-    <section className="rounded-3xl border border-slate-800/70 bg-slate-950/70 p-6">
-      <h3 className="text-lg font-semibold">{title}</h3>
+    <section className="rounded-3xl border app-border app-surface p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 className="text-lg font-semibold">{title}</h3>
+          <p className="mt-1 text-xs text-subtle">
+            Общо: {tools.length}
+          </p>
+        </div>
+        {showActions ? (
+          <span className="rounded-full border app-border app-panel px-3 py-1 text-xs text-subtle">
+            Управление на инструментите
+          </span>
+        ) : null}
+      </div>
       {tools.length === 0 ? (
-        <p className="mt-3 text-sm text-slate-400">Няма резултати.</p>
+        <p className="mt-3 text-sm text-subtle">Няма резултати.</p>
       ) : (
         <div className="mt-4 grid gap-4">
           {tools.map((tool) => (
             <article
               key={tool.id}
-              className="rounded-2xl border border-slate-800/70 bg-slate-900/60 p-4"
+              className="rounded-2xl border app-border app-panel p-4"
             >
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <h4 className="text-base font-semibold text-slate-100">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h4 className="text-base font-semibold text-primary">
                   {tool.name}
                 </h4>
                 <div className="flex items-center gap-2 text-xs">
                   {tool.link ? (
                     <a
-                      className="text-emerald-300 hover:text-emerald-200"
+                      className="accent-text hover:text-[color:var(--accent)]"
                       href={tool.link}
                       target="_blank"
                       rel="noreferrer"
@@ -49,7 +61,7 @@ export default function ToolList({
                   currentUserId &&
                   tool.created_by === currentUserId ? (
                     <button
-                      className="text-slate-300 hover:text-slate-100"
+                      className="text-muted hover:text-primary"
                       type="button"
                       onClick={() => onEdit(tool)}
                     >
@@ -71,26 +83,26 @@ export default function ToolList({
                 </div>
               </div>
               {tool.description ? (
-                <p className="mt-2 text-sm text-slate-300">
+                <p className="mt-2 text-sm text-muted">
                   {tool.description}
                 </p>
               ) : null}
-              <p className="mt-3 text-xs text-slate-500">
+              <p className="mt-3 text-xs text-subtle">
                 Създадено от:{" "}
-                <span className="text-slate-300">
+                <span className="text-muted">
                   {tool.creator?.name ||
                     tool.creator?.email ||
                     (tool.created_by ? `Потребител #${tool.created_by}` : "—")}
                 </span>
               </p>
-              <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-400">
+              <div className="mt-3 flex flex-wrap gap-2 text-xs text-subtle">
                 {tool.categories?.map((category) => (
-                  <span key={category.id} className="rounded-full bg-slate-800 px-2 py-1">
+                  <span key={category.id} className="rounded-full app-panel px-2 py-1">
                     {category.name}
                   </span>
                 ))}
                 {tool.tags?.map((tag) => (
-                  <span key={tag.id} className="rounded-full bg-slate-800 px-2 py-1">
+                  <span key={tag.id} className="rounded-full app-panel px-2 py-1">
                     #{tag.name}
                   </span>
                 ))}

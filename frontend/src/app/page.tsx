@@ -32,10 +32,13 @@ export default function Home() {
   }, [user]);
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,#18212f,#0b0f1a_55%,#07090f)] text-slate-100">
+    <div className="min-h-screen app-shell">
       <AppHeader
         isAuthenticated={Boolean(user)}
         onLogout={logout}
+        userName={user?.name}
+        userEmail={user?.email}
+        userRole={user?.role}
         links={
           user
             ? [
@@ -48,7 +51,7 @@ export default function Home() {
 
       <main className="mx-auto grid w-full max-w-6xl gap-10 px-6 pb-16 pt-8 lg:grid-cols-[1.2fr_0.8fr]">
         {isChecking ? (
-          <section className="rounded-3xl border border-slate-800/70 bg-slate-950/70 p-8 shadow-2xl shadow-black/40 lg:col-span-2">
+          <section className="rounded-3xl border app-border app-surface p-8 shadow-2xl shadow-black/40 lg:col-span-2">
             <Loader label="Проверка на сесията..." />
           </section>
         ) : !user ? (

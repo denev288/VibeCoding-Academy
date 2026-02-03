@@ -10,22 +10,29 @@ type DashboardProps = {
 export default function Dashboard({ user, tools }: DashboardProps) {
   return (
     <>
-      <section className="rounded-3xl border border-slate-800/70 bg-slate-950/70 p-8 shadow-2xl shadow-black/40">
-        <p className="text-xs uppercase tracking-[0.4em] text-slate-500">
-          Dashboard
-        </p>
-        <h2 className="mt-4 text-3xl font-semibold">
+      <section className="rounded-3xl border app-border app-surface p-8 shadow-2xl shadow-black/40">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-xs uppercase tracking-[0.4em] text-subtle">
+              Dashboard
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold text-primary">
           Добре дошъл, {user.name}!
-        </h2>
-        <p className="mt-3 text-sm text-slate-300">
-          Ти си с роля: <span className="font-semibold">{user.role}</span>
-        </p>
-        <div className="mt-6 rounded-2xl border border-slate-800/70 bg-slate-900/60 p-4 text-sm text-slate-300">
-          <p className="text-xs uppercase text-slate-500">Потребител</p>
-          <p className="mt-2 text-base font-semibold text-slate-100">
+            </h2>
+            <p className="mt-3 text-sm text-muted">
+              Ти си с роля: <span className="font-semibold">{user.role}</span>
+            </p>
+          </div>
+          <div className="rounded-2xl border app-border app-panel px-4 py-2 text-xs text-subtle">
+            Активен профил
+          </div>
+        </div>
+        <div className="mt-6 rounded-2xl border app-border app-panel p-4 text-sm text-muted">
+          <p className="text-xs uppercase text-subtle">Потребител</p>
+          <p className="mt-2 text-base font-semibold text-primary">
             ID: {user.id}
           </p>
-          <p className="text-xs text-slate-400">{user.email}</p>
+          <p className="text-xs text-subtle">{user.email}</p>
         </div>
       </section>
 
