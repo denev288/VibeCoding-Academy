@@ -26,6 +26,7 @@ class Tool extends Model
         'examples',
         'resource_links',
         'created_by',
+        'status',
     ];
 
     protected $casts = [

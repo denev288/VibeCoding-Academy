@@ -9,10 +9,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Tag;
 use App\Models\Tool;
+use App\Models\ToolActionChallenge;
 use App\Models\ToolRole;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -250,6 +253,85 @@ class ToolController extends Controller
             return response()->json(['message' => 'Нямате права да изтриете този инструмент.'], 403);
         }
 
+        $tool->delete();
+
+        return response()->json(['status' => 'deleted']);
+    }
+
+    public function requestDeleteCode(Request $request, Tool $tool): JsonResponse
+    {
+        if ((int) $tool->created_by !== (int) Auth::id()) {
+            return response()->json(['message' => 'Нямате права да изтриете този инструмент.'], 403);
+        }
+
+        $user = $request->user();
+        $data = $request->validate([
+            'email' => ['nullable', 'email'],
+        ]);
+        $targetEmail = $data['email'] ?? $user->email;
+        $code = (string) random_int(100000, 999999);
+
+        ToolActionChallenge::where('user_id', $user->id)
+            ->where('tool_id', $tool->id)
+            ->where('action', 'delete_tool')
+            ->whereNull('consumed_at')
+            ->delete();
+
+        ToolActionChallenge::create([
+            'user_id' => $user->id,
+            'tool_id' => $tool->id,
+            'action' => 'delete_tool',
+            'code_hash' => Hash::make($code),
+            'expires_at' => now()->addMinutes(10),
+            'attempts' => 0,
+            'max_attempts' => 5,
+        ]);
+
+        Mail::raw(
+            "Код за изтриване на инструмент \"{$tool->name}\": {$code}\nВалиден 10 минути.",
+            static function ($message) use ($targetEmail) {
+                $message->to($targetEmail)->subject('Код за потвърждение (изтриване)');
+            }
+        );
+
+        return response()->json(['status' => 'sent']);
+    }
+
+    public function confirmDelete(Request $request, Tool $tool): JsonResponse
+    {
+        if ((int) $tool->created_by !== (int) Auth::id()) {
+            return response()->json(['message' => 'Нямате права да изтриете този инструмент.'], 403);
+        }
+
+        $data = $request->validate([
+            'code' => ['required', 'string'],
+        ]);
+
+        $challenge = ToolActionChallenge::where('user_id', Auth::id())
+            ->where('tool_id', $tool->id)
+            ->where('action', 'delete_tool')
+            ->whereNull('consumed_at')
+            ->latest()
+            ->first();
+
+        if (!$challenge) {
+            return response()->json(['message' => 'Няма активен код за потвърждение.'], 422);
+        }
+
+        if ($challenge->expires_at->isPast()) {
+            return response()->json(['message' => 'Кодът е изтекъл.'], 422);
+        }
+
+        if ($challenge->attempts >= $challenge->max_attempts) {
+            return response()->json(['message' => 'Прекалено много опити.'], 429);
+        }
+
+        if (!Hash::check($data['code'], $challenge->code_hash)) {
+            $challenge->increment('attempts');
+            return response()->json(['message' => 'Невалиден код.'], 422);
+        }
+
+        $challenge->update(['consumed_at' => now()]);
         $tool->delete();
 
         return response()->json(['status' => 'deleted']);

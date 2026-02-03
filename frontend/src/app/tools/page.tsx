@@ -10,12 +10,13 @@ import ToolFilters from "@/features/tools/components/ToolFilters";
 import ToolForm from "@/features/tools/components/ToolForm";
 import ToolList from "@/features/tools/components/ToolList";
 import {
+  confirmToolDeleteCode,
   createTool,
-  deleteTool,
   fetchCategories,
   fetchRoles,
   fetchTags,
   fetchTools,
+  requestToolDeleteCode,
   updateTool,
 } from "@/features/tools/services";
 import type { Category, Tag, Tool } from "@/features/tools/types";
@@ -56,6 +57,10 @@ export default function ToolsPage() {
   const [editingToolId, setEditingToolId] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [pendingDelete, setPendingDelete] = useState<Tool | null>(null);
+  const [deleteCode, setDeleteCode] = useState("");
+  const [deleteEmail, setDeleteEmail] = useState("");
+  const [deleteStep, setDeleteStep] = useState<"idle" | "sent">("idle");
+  const [deleteStatus, setDeleteStatus] = useState<string>("");
   const [toasts, setToasts] = useState<
     { id: string; message: string; tone: "success" | "error" }[]
   >([]);
@@ -162,27 +167,50 @@ export default function ToolsPage() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (tool: Tool) => {
-    if (!user || tool.created_by !== user.id) return;
-    const result = await deleteTool(tool.id);
-    if (result.ok) {
-      fetchTools(filters).then(setTools).catch(() => setTools([]));
-      pushToast("Инструментът е изтрит.", "success");
-    } else {
-      setFormStatus(result.error ?? "Грешка при изтриване.");
-      pushToast(result.error ?? "Грешка при изтриване.", "error");
-    }
-  };
-
   const handleDeleteRequest = (tool: Tool) => {
     if (!user || tool.created_by !== user.id) return;
     setPendingDelete(tool);
+    setDeleteCode("");
+    setDeleteEmail(user?.email ?? "");
+    setDeleteStep("idle");
+    setDeleteStatus("");
+  };
+
+  const sendDeleteCode = async () => {
+    if (!pendingDelete) return;
+    setDeleteStatus("Изпращане на код...");
+    const result = await requestToolDeleteCode(
+      pendingDelete.id,
+      deleteEmail.trim() || undefined
+    );
+    if (result.ok) {
+      setDeleteStep("sent");
+      setDeleteStatus("Кодът е изпратен на email.");
+      pushToast("Изпратихме код на email.", "success");
+    } else {
+      setDeleteStatus(result.error ?? "Грешка при изпращане на код.");
+      pushToast(result.error ?? "Грешка при изпращане на код.", "error");
+    }
   };
 
   const confirmDelete = async () => {
     if (!pendingDelete) return;
-    await handleDelete(pendingDelete);
-    setPendingDelete(null);
+    setDeleteStatus("Потвърждение...");
+    const result = await confirmToolDeleteCode(
+      pendingDelete.id,
+      deleteCode.trim()
+    );
+    if (result.ok) {
+      fetchTools(filters).then(setTools).catch(() => setTools([]));
+      pushToast("Инструментът е изтрит.", "success");
+      setPendingDelete(null);
+      setDeleteCode("");
+      setDeleteStep("idle");
+      setDeleteStatus("");
+    } else {
+      setDeleteStatus(result.error ?? "Грешка при потвърждение.");
+      pushToast(result.error ?? "Грешка при потвърждение.", "error");
+    }
   };
 
   const pushToast = (message: string, tone: "success" | "error") => {
@@ -364,28 +392,78 @@ export default function ToolsPage() {
                   <h3 className="text-lg font-semibold text-primary">
                     Потвърди изтриване
                   </h3>
-                  <p className="mt-2 text-sm text-muted">
-                    Сигурен ли си, че искаш да изтриеш{" "}
-                    <span className="font-semibold text-primary">
-                      {pendingDelete.name}
-                    </span>
-                    ?
-                  </p>
+                    <p className="mt-2 text-sm text-muted">
+                      Сигурен ли си, че искаш да изтриеш{" "}
+                      <span className="font-semibold text-primary">
+                        {pendingDelete.name}
+                      </span>
+                      ?
+                    </p>
+                  <div className="mt-4 grid gap-2 text-sm text-muted">
+                    <label className="grid gap-2 text-sm text-muted">
+                      Имейл за код
+                      <input
+                        className="rounded-xl border app-border app-panel px-3 py-2 text-sm text-primary"
+                 
+                        onChange={(event) => setDeleteEmail(event.target.value)}
+                        placeholder="name@example.com"
+                        type="email"
+                      />
+                    </label>
+                    {deleteStep === "sent" ? (
+                      <label className="grid gap-2 text-sm text-muted">
+                        Въведи кода от email
+                        <input
+                          className="rounded-xl border app-border app-panel px-3 py-2 text-sm text-primary"
+                          value={deleteCode}
+                          onChange={(event) => setDeleteCode(event.target.value)}
+                          placeholder="6-цифрен код"
+                        />
+                      </label>
+                    ) : null}
+                    {deleteStatus ? (
+                      <p className="text-xs text-subtle">{deleteStatus}</p>
+                    ) : null}
+                    {deleteStep !== "sent" ? (
+                      <p className="text-xs text-subtle">
+                        Ще изпратим 6-цифрен код за потвърждение.
+                      </p>
+                    ) : null}
+                  </div>
+
                   <div className="mt-6 flex flex-wrap justify-end gap-3">
                     <button
                       className="rounded-full border app-border app-panel px-4 py-2 text-xs text-primary hover:border-slate-400"
                       type="button"
-                      onClick={() => setPendingDelete(null)}
+                      onClick={() => {
+                        setPendingDelete(null);
+                        setDeleteCode("");
+                        setDeleteEmail("");
+                        setDeleteStep("idle");
+                        setDeleteStatus("");
+                      }}
                     >
                       Откажи
                     </button>
-                    <button
-                      className="rounded-full border border-rose-400/70 bg-rose-500/10 px-4 py-2 text-xs text-rose-200 hover:border-rose-300"
-                      type="button"
-                      onClick={confirmDelete}
-                    >
-                      Изтрий
-                    </button>
+                    {deleteStep === "sent" ? (
+                      <button
+                        className="rounded-full border border-rose-400/70 bg-rose-500/10 px-4 py-2 text-xs text-rose-200 hover:border-rose-300"
+                        type="button"
+                        onClick={confirmDelete}
+                        disabled={!deleteCode.trim()}
+                      >
+                        Изтрий
+                      </button>
+                    ) : (
+                      <button
+                        className="rounded-full accent-border accent-soft px-4 py-2 text-xs accent-text"
+                        type="button"
+                        onClick={sendDeleteCode}
+                        disabled={!deleteEmail.trim()}
+                      >
+                        Изпрати код
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

@@ -53,3 +53,5 @@ Route::get('/tools/{tool}', [ToolController::class, 'show'])->middleware('auth:s
 Route::post('/tools', [ToolController::class, 'store'])->middleware('auth:sanctum');
 Route::put('/tools/{tool}', [ToolController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/tools/{tool}', [ToolController::class, 'destroy'])->middleware('auth:sanctum');
+Route::post('/tools/{tool}/delete-request', [ToolController::class, 'requestDeleteCode'])->middleware('auth:sanctum');
+Route::post('/tools/{tool}/delete-confirm', [ToolController::class, 'confirmDelete'])->middleware('auth:sanctum');

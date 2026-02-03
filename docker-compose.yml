@@ -37,6 +37,15 @@ services:
     networks:
       - vibecode
 
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: vibecode_mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    networks:
+      - vibecode
+
 networks:
   vibecode:
     driver: bridge

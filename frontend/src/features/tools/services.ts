@@ -170,3 +170,45 @@ export async function deleteTool(id: number): Promise<ApiResult<null>> {
   if (!res.ok) return { ok: false, error: await parseError(res) };
   return { ok: true, data: null };
 }
+
+export async function requestToolDeleteCode(
+  id: number,
+  email?: string
+): Promise<ApiResult<null>> {
+  await getCsrfCookie();
+  const xsrfToken = readXsrfToken();
+  const res = await fetch(`${API_BASE}/api/tools/${id}/delete-request`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-Requested-With": "XMLHttpRequest",
+      ...(xsrfToken ? { "X-XSRF-TOKEN": xsrfToken } : {}),
+    },
+    body: JSON.stringify(email ? { email } : {}),
+  });
+  if (!res.ok) return { ok: false, error: await parseError(res) };
+  return { ok: true, data: null };
+}
+
+export async function confirmToolDeleteCode(
+  id: number,
+  code: string
+): Promise<ApiResult<null>> {
+  await getCsrfCookie();
+  const xsrfToken = readXsrfToken();
+  const res = await fetch(`${API_BASE}/api/tools/${id}/delete-confirm`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-Requested-With": "XMLHttpRequest",
+      ...(xsrfToken ? { "X-XSRF-TOKEN": xsrfToken } : {}),
+    },
+    body: JSON.stringify({ code }),
+  });
+  if (!res.ok) return { ok: false, error: await parseError(res) };
+  return { ok: true, data: null };
+}
