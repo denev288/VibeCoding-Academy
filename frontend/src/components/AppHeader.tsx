@@ -22,9 +22,7 @@ export default function AppHeader({
   userRole,
 }: AppHeaderProps) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isSectionsOpen, setIsSectionsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
-  const sectionsRef = useRef<HTMLDivElement | null>(null);
   const { theme, toggleTheme } = useTheme();
   const initials =
     userName
@@ -37,6 +35,7 @@ export default function AppHeader({
   const roleSections: Record<string, { label: string; href: string }[]> = {
     owner: [
       { label: "Админ панел", href: "/admin" },
+      { label: "Audit Logs", href: "/admin/audit" },
       { label: "Екип", href: "/team" },
       { label: "Отчети", href: "/reports" },
     ],
@@ -68,9 +67,6 @@ export default function AppHeader({
       const target = event.target as Node;
       if (menuRef.current && !menuRef.current.contains(target)) {
         setIsProfileOpen(false);
-      }
-      if (sectionsRef.current && !sectionsRef.current.contains(target)) {
-        setIsSectionsOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClick);
@@ -162,32 +158,17 @@ export default function AppHeader({
             </Link>
           ))}
           {isAuthenticated && menuItems.length ? (
-            <div className="relative" ref={sectionsRef}>
-              <button
-                className="rounded-full border app-border app-panel px-4 py-2 text-xs font-medium text-primary transition hover:border-slate-500"
-                type="button"
-                onClick={() => {
-                  setIsSectionsOpen((prev) => !prev);
-                  setIsProfileOpen(false);
-                }}
-              >
-                Секции
-              </button>
-              {isSectionsOpen ? (
-                <div className="absolute left-0 mt-2 min-w-[200px] rounded-2xl border app-border app-surface p-2 text-sm text-primary shadow-xl">
-                  {menuItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      className="block rounded-xl px-3 py-2 text-sm transition hover:bg-slate-900/20"
-                      href={item.href}
-                      onClick={() => setIsSectionsOpen(false)}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              ) : null}
-            </div>
+            <>
+              {menuItems.map((item) => (
+                <Link
+                  key={item.href}
+                  className="rounded-full border app-border app-panel px-4 py-2 text-xs font-medium text-primary transition hover:border-slate-500"
+                  href={item.href}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </>
           ) : null}
         </nav>
       ) : null}

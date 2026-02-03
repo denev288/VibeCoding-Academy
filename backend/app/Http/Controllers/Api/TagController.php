@@ -9,6 +9,7 @@ use App\Models\Tag;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Services\AuditLogger;
 
 class TagController extends Controller
 {
@@ -29,6 +30,10 @@ class TagController extends Controller
             ['slug' => $slug],
             ['name' => $data['name'], 'slug' => $slug]
         );
+
+        AuditLogger::log($request->user(), 'tag.created', $tag, [
+            'name' => $tag->name,
+        ], $request);
 
         return response()->json($tag, 201);
     }

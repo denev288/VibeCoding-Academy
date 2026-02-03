@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Tool;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Services\AuditLogger;
 
 class ToolAdminController extends Controller
 {
@@ -66,22 +67,20 @@ class ToolAdminController extends Controller
 
     public function approve(Request $request, Tool $tool): JsonResponse
     {
-        if ($response = $this->ensureOwner($request)) {
-            return $response;
-        }
-
         $tool->update(['status' => 'approved']);
+        AuditLogger::log($request->user(), 'tool.approved', $tool, [
+            'status' => 'approved',
+        ], $request);
 
         return response()->json($tool);
     }
 
     public function reject(Request $request, Tool $tool): JsonResponse
     {
-        if ($response = $this->ensureOwner($request)) {
-            return $response;
-        }
-
         $tool->update(['status' => 'rejected']);
+        AuditLogger::log($request->user(), 'tool.rejected', $tool, [
+            'status' => 'rejected',
+        ], $request);
 
         return response()->json($tool);
     }

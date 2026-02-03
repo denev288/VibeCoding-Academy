@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\TagController;
 use App\Http\Controllers\Api\ToolController;
 use App\Http\Controllers\Api\Admin\ToolAdminController;
+use App\Http\Controllers\Api\Admin\ActivityLogController;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -50,6 +51,7 @@ Route::get('/tags', [TagController::class, 'index']);
 Route::post('/tags', [TagController::class, 'store'])->middleware('auth:sanctum');
 
 Route::get('/tools', [ToolController::class, 'index'])->middleware('auth:sanctum');
+Route::get('/tools/count', [ToolController::class, 'count'])->middleware('auth:sanctum');
 Route::get('/tools/{tool}', [ToolController::class, 'show'])->middleware('auth:sanctum');
 Route::post('/tools', [ToolController::class, 'store'])->middleware('auth:sanctum');
 Route::put('/tools/{tool}', [ToolController::class, 'update'])->middleware('auth:sanctum');
@@ -57,6 +59,11 @@ Route::delete('/tools/{tool}', [ToolController::class, 'destroy'])->middleware('
 Route::post('/tools/{tool}/delete-request', [ToolController::class, 'requestDeleteCode'])->middleware('auth:sanctum');
 Route::post('/tools/{tool}/delete-confirm', [ToolController::class, 'confirmDelete'])->middleware('auth:sanctum');
 
-Route::get('/admin/tools', [ToolAdminController::class, 'index'])->middleware('auth:sanctum');
-Route::post('/admin/tools/{tool}/approve', [ToolAdminController::class, 'approve'])->middleware('auth:sanctum');
-Route::post('/admin/tools/{tool}/reject', [ToolAdminController::class, 'reject'])->middleware('auth:sanctum');
+Route::get('/admin/tools', [ToolAdminController::class, 'index'])
+    ->middleware(['auth:sanctum', 'role:owner']);
+Route::post('/admin/tools/{tool}/approve', [ToolAdminController::class, 'approve'])
+    ->middleware(['auth:sanctum', 'role:owner']);
+Route::post('/admin/tools/{tool}/reject', [ToolAdminController::class, 'reject'])
+    ->middleware(['auth:sanctum', 'role:owner']);
+Route::get('/admin/activity-logs', [ActivityLogController::class, 'index'])
+    ->middleware(['auth:sanctum', 'role:owner']);

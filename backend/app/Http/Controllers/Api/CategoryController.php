@@ -8,13 +8,19 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use App\Services\AuditLogger;
 
 class CategoryController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json(Category::query()->orderBy('name')->get());
+        $categories = Cache::remember('categories.all', 300, function () {
+            return Category::query()->orderBy('name')->get();
+        });
+
+        return response()->json($categories);
     }
 
     public function store(Request $request): JsonResponse
@@ -29,6 +35,11 @@ class CategoryController extends Controller
             ['slug' => $slug],
             ['name' => $data['name'], 'slug' => $slug]
         );
+
+        Cache::forget('categories.all');
+        AuditLogger::log($request->user(), 'category.created', $category, [
+            'name' => $category->name,
+        ], $request);
 
         return response()->json($category, 201);
     }

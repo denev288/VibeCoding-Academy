@@ -46,6 +46,14 @@ services:
     networks:
       - vibecode
 
+  redis:
+    image: redis:7-alpine
+    container_name: vibecode_redis
+    ports:
+      - "8204:6379"
+    networks:
+      - vibecode
+
 networks:
   vibecode:
     driver: bridge

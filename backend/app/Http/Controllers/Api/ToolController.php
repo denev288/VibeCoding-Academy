@@ -14,10 +14,12 @@ use App\Models\ToolRole;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use App\Services\AuditLogger;
 
 class ToolController extends Controller
 {
@@ -95,6 +97,15 @@ class ToolController extends Controller
         return response()->json($tools);
     }
 
+    public function count(): JsonResponse
+    {
+        $count = Cache::remember('tools.count', 300, function () {
+            return Tool::query()->count();
+        });
+
+        return response()->json(['count' => $count]);
+    }
+
     public function show(Request $request, Tool $tool): JsonResponse
     {
         $tool->load(['categories', 'tags', 'roleAssignments', 'creator']);
@@ -153,6 +164,8 @@ class ToolController extends Controller
             'status' => 'pending',
         ]);
 
+        Cache::forget('tools.count');
+
         $categoryIds = $data['category_ids'] ?? [];
         if (!empty($data['new_category'])) {
             $slug = Str::slug($data['new_category']);
@@ -188,6 +201,11 @@ class ToolController extends Controller
                 'role' => $role,
             ]);
         }
+
+        AuditLogger::log($request->user(), 'tool.created', $tool, [
+            'name' => $tool->name,
+            'status' => $tool->status,
+        ], $request);
 
         return response()->json($tool->load(['categories', 'tags', 'roleAssignments']), 201);
     }
@@ -265,16 +283,28 @@ class ToolController extends Controller
             }
         }
 
+        AuditLogger::log($request->user(), 'tool.updated', $tool, [
+            'name' => $tool->name,
+            'status' => $tool->status,
+        ], $request);
+
         return response()->json($tool->load(['categories', 'tags', 'roleAssignments']));
     }
 
-    public function destroy(Tool $tool): JsonResponse
+    public function destroy(Request $request, Tool $tool): JsonResponse
     {
         if ((int) $tool->created_by !== (int) Auth::id()) {
             return response()->json(['message' => 'Нямате права да изтриете този инструмент.'], 403);
         }
 
+        AuditLogger::log($request->user(), 'tool.deleted', $tool, [
+            'name' => $tool->name,
+            'status' => $tool->status,
+        ], $request);
+
         $tool->delete();
+
+        Cache::forget('tools.count');
 
         return response()->json(['status' => 'deleted']);
     }
