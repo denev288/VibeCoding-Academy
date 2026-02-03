@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { User } from "@/types/user";
 import {
   fetchUser,
@@ -16,6 +17,7 @@ const SESSION_FLAG = "vc_session_active";
 const USER_CACHE = "vc_user";
 
 export function useAuthSession() {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [status, setStatus] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -101,6 +103,7 @@ export function useAuthSession() {
       window.localStorage.removeItem(SESSION_FLAG);
     }
     setStatus("Излязъл");
+    router.push("/");
   };
 
   return {

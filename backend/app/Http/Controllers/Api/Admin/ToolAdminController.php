@@ -1,0 +1,88 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers\Api\Admin;
+
+use App\Enums\Role;
+use App\Http\Controllers\Controller;
+use App\Models\Tool;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+
+class ToolAdminController extends Controller
+{
+    private function roleValue($user): ?string
+    {
+        if (!$user) {
+            return null;
+        }
+        return $user->role instanceof Role ? $user->role->value : $user->role;
+    }
+
+    private function ensureOwner(Request $request): ?JsonResponse
+    {
+        $user = $request->user();
+        if (!$user || $this->roleValue($user) !== Role::OWNER->value) {
+            return response()->json(['message' => 'Нямате достъп до админ панела.'], 403);
+        }
+        return null;
+    }
+
+    public function index(Request $request): JsonResponse
+    {
+        if ($response = $this->ensureOwner($request)) {
+            return $response;
+        }
+
+        $query = Tool::query()->with(['categories', 'tags', 'roleAssignments', 'creator']);
+
+        if ($request->filled('category')) {
+            $category = $request->query('category');
+            $query->whereHas('categories', function ($builder) use ($category) {
+                if (is_numeric($category)) {
+                    $builder->where('categories.id', (int) $category);
+                } else {
+                    $builder->where('categories.slug', $category);
+                }
+            });
+        }
+
+        if ($request->filled('role')) {
+            $role = $request->query('role');
+            $query->whereHas('roleAssignments', function ($builder) use ($role) {
+                $builder->where('role', $role);
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->query('status'));
+        }
+
+        $tools = $query->latest()->get();
+
+        return response()->json($tools);
+    }
+
+    public function approve(Request $request, Tool $tool): JsonResponse
+    {
+        if ($response = $this->ensureOwner($request)) {
+            return $response;
+        }
+
+        $tool->update(['status' => 'approved']);
+
+        return response()->json($tool);
+    }
+
+    public function reject(Request $request, Tool $tool): JsonResponse
+    {
+        if ($response = $this->ensureOwner($request)) {
+            return $response;
+        }
+
+        $tool->update(['status' => 'rejected']);
+
+        return response()->json($tool);
+    }
+}

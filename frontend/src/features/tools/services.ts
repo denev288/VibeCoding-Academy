@@ -212,3 +212,51 @@ export async function confirmToolDeleteCode(
   if (!res.ok) return { ok: false, error: await parseError(res) };
   return { ok: true, data: null };
 }
+
+export async function fetchAdminTools(filters: ToolFilters & { status?: string } = {}): Promise<Tool[]> {
+  const params = new URLSearchParams();
+  if (filters.name) params.set("name", filters.name);
+  if (filters.role) params.set("role", filters.role);
+  if (filters.category) params.set("category", filters.category);
+  if (filters.tags) params.set("tags", filters.tags);
+  if (filters.status) params.set("status", filters.status);
+  const query = params.toString();
+
+  const res = await fetch(`${API_BASE}/api/admin/tools${query ? `?${query}` : ""}`, {
+    credentials: "include",
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function approveTool(id: number): Promise<ApiResult<Tool>> {
+  await getCsrfCookie();
+  const xsrfToken = readXsrfToken();
+  const res = await fetch(`${API_BASE}/api/admin/tools/${id}/approve`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      Accept: "application/json",
+      "X-Requested-With": "XMLHttpRequest",
+      ...(xsrfToken ? { "X-XSRF-TOKEN": xsrfToken } : {}),
+    },
+  });
+  if (!res.ok) return { ok: false, error: await parseError(res) };
+  return { ok: true, data: await res.json() };
+}
+
+export async function rejectTool(id: number): Promise<ApiResult<Tool>> {
+  await getCsrfCookie();
+  const xsrfToken = readXsrfToken();
+  const res = await fetch(`${API_BASE}/api/admin/tools/${id}/reject`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      Accept: "application/json",
+      "X-Requested-With": "XMLHttpRequest",
+      ...(xsrfToken ? { "X-XSRF-TOKEN": xsrfToken } : {}),
+    },
+  });
+  if (!res.ok) return { ok: false, error: await parseError(res) };
+  return { ok: true, data: await res.json() };
+}

@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\TagController;
 use App\Http\Controllers\Api\ToolController;
+use App\Http\Controllers\Api\Admin\ToolAdminController;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -55,3 +56,7 @@ Route::put('/tools/{tool}', [ToolController::class, 'update'])->middleware('auth
 Route::delete('/tools/{tool}', [ToolController::class, 'destroy'])->middleware('auth:sanctum');
 Route::post('/tools/{tool}/delete-request', [ToolController::class, 'requestDeleteCode'])->middleware('auth:sanctum');
 Route::post('/tools/{tool}/delete-confirm', [ToolController::class, 'confirmDelete'])->middleware('auth:sanctum');
+
+Route::get('/admin/tools', [ToolAdminController::class, 'index'])->middleware('auth:sanctum');
+Route::post('/admin/tools/{tool}/approve', [ToolAdminController::class, 'approve'])->middleware('auth:sanctum');
+Route::post('/admin/tools/{tool}/reject', [ToolAdminController::class, 'reject'])->middleware('auth:sanctum');

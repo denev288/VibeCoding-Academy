@@ -16,6 +16,18 @@ export default function ToolList({
   onDelete,
 }: ToolListProps) {
   const showActions = Boolean(onEdit || onDelete);
+  const statusLabel = (status?: string | null) => {
+    if (status === "approved") return "Одобрен";
+    if (status === "rejected") return "Отказан";
+    if (status === "pending") return "Изчакване";
+    return "—";
+  };
+  const statusClass = (status?: string | null) => {
+    if (status === "approved") return "text-emerald-300";
+    if (status === "rejected") return "text-rose-300";
+    if (status === "pending") return "text-orange-300";
+    return "text-muted";
+  };
 
   return (
     <section className="rounded-3xl border app-border app-surface p-6">
@@ -87,6 +99,12 @@ export default function ToolList({
                   {tool.description}
                 </p>
               ) : null}
+              <p className="mt-3 text-xs text-subtle">
+                Статус:{" "}
+                <span className={statusClass(tool.status)}>
+                  {statusLabel(tool.status)}
+                </span>
+              </p>
               <p className="mt-3 text-xs text-subtle">
                 Създадено от:{" "}
                 <span className="text-muted">

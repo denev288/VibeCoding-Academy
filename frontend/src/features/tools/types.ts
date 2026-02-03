@@ -29,6 +29,7 @@ export type Tool = {
   video_url?: string | null;
   difficulty?: "beginner" | "intermediate" | "advanced" | null;
   resource_links?: string[] | null;
+  status?: "pending" | "approved" | "rejected";
   link?: string | null;
   documentation_url?: string | null;
   documentation?: string | null;

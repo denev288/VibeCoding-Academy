@@ -21,14 +21,33 @@ use Illuminate\Validation\Rule;
 
 class ToolController extends Controller
 {
+    private function roleValue($user): ?string
+    {
+        if (!$user) {
+            return null;
+        }
+        return $user->role instanceof Role ? $user->role->value : $user->role;
+    }
+
     public function index(Request $request): JsonResponse
     {
         $query = Tool::query()->with(['categories', 'tags', 'roleAssignments', 'creator']);
         $user = $request->user();
+        $roleValue = $this->roleValue($user);
 
-        if ($user && $user->role !== Role::OWNER->value) {
-            $query->whereHas('roleAssignments', function ($builder) use ($user) {
-                $builder->where('role', $user->role);
+        if ($user && $roleValue !== Role::OWNER->value) {
+            $query->where(function ($builder) use ($roleValue, $user) {
+                $builder
+                    ->where(function ($inner) use ($roleValue) {
+                        $inner->whereHas('roleAssignments', function ($roleBuilder) use ($roleValue) {
+                            $roleBuilder->where('role', $roleValue);
+                        })
+                        ->where('status', 'approved');
+                    })
+                    ->orWhere(function ($inner) use ($user) {
+                        $inner->where('created_by', $user->id)
+                            ->whereIn('status', ['pending', 'rejected']);
+                    });
             });
         }
 
@@ -80,9 +99,10 @@ class ToolController extends Controller
     {
         $tool->load(['categories', 'tags', 'roleAssignments', 'creator']);
         $user = $request->user();
+        $roleValue = $this->roleValue($user);
 
-        if ($user && $user->role !== Role::OWNER->value) {
-            $allowed = $tool->roleAssignments->contains('role', $user->role);
+        if ($user && $roleValue !== Role::OWNER->value) {
+            $allowed = $tool->roleAssignments->contains('role', $roleValue);
             if (!$allowed) {
                 return response()->json(['message' => 'Нямате достъп до този инструмент.'], 403);
             }
@@ -130,6 +150,7 @@ class ToolController extends Controller
             'examples' => $data['examples'] ?? null,
             'resource_links' => $data['resource_links'] ?? null,
             'created_by' => Auth::id(),
+            'status' => 'pending',
         ]);
 
         $categoryIds = $data['category_ids'] ?? [];
