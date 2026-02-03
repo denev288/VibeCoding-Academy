@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Models\Tool;
 use Illuminate\Http\JsonResponse;
@@ -13,29 +12,8 @@ use App\Services\AuditLogger;
 
 class ToolAdminController extends Controller
 {
-    private function roleValue($user): ?string
-    {
-        if (!$user) {
-            return null;
-        }
-        return $user->role instanceof Role ? $user->role->value : $user->role;
-    }
-
-    private function ensureOwner(Request $request): ?JsonResponse
-    {
-        $user = $request->user();
-        if (!$user || $this->roleValue($user) !== Role::OWNER->value) {
-            return response()->json(['message' => 'Нямате достъп до админ панела.'], 403);
-        }
-        return null;
-    }
-
     public function index(Request $request): JsonResponse
     {
-        if ($response = $this->ensureOwner($request)) {
-            return $response;
-        }
-
         $query = Tool::query()->with(['categories', 'tags', 'roleAssignments', 'creator']);
 
         if ($request->filled('category')) {

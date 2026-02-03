@@ -71,7 +71,7 @@ export default function ToolForm({
         <label className="grid gap-2 text-sm text-muted">
           Име
           <input
-            className="rounded-xl border app-border app-panel px-3 py-2 text-sm text-primary focus:border-[color:var(--accent)] focus:outline-none"
+            className="rounded-xl border app-border app-panel px-3 py-2 text-sm text-primary focus:border-(--accent) focus:outline-none"
             value={name}
             onChange={(event) => onChange("name", event.target.value)}
             required
@@ -80,7 +80,7 @@ export default function ToolForm({
         <label className="grid gap-2 text-sm text-muted">
           Линк
           <input
-            className="rounded-xl border app-border app-panel px-3 py-2 text-sm text-primary focus:border-[color:var(--accent)] focus:outline-none"
+            className="rounded-xl border app-border app-panel px-3 py-2 text-sm text-primary focus:border-(--accent) focus:outline-none"
             value={link}
             onChange={(event) => onChange("link", event.target.value)}
             placeholder="https://"
@@ -89,7 +89,7 @@ export default function ToolForm({
         <label className="grid gap-2 text-sm text-muted">
           Документация (линк)
           <input
-            className="rounded-xl border app-border app-panel px-3 py-2 text-sm text-primary focus:border-[color:var(--accent)] focus:outline-none"
+            className="rounded-xl border app-border app-panel px-3 py-2 text-sm text-primary focus:border-(--accent) focus:outline-none"
             value={documentationUrl}
             onChange={(event) => onChange("documentationUrl", event.target.value)}
             placeholder="https://"
@@ -98,7 +98,7 @@ export default function ToolForm({
         <label className="grid gap-2 text-sm text-muted lg:col-span-2">
           Документация (markdown)
           <textarea
-            className="min-h-[120px] rounded-xl border app-border app-panel px-3 py-2 text-sm text-primary focus:border-[color:var(--accent)] focus:outline-none"
+            className="min-h-30 rounded-xl border app-border app-panel px-3 py-2 text-sm text-primary focus:border-(--accent) focus:outline-none"
             value={documentation}
             onChange={(event) => onChange("documentation", event.target.value)}
           />
@@ -106,7 +106,7 @@ export default function ToolForm({
         <label className="grid gap-2 text-sm text-muted">
           Описание
           <textarea
-            className="min-h-[100px] rounded-xl border app-border app-panel px-3 py-2 text-sm text-primary focus:border-[color:var(--accent)] focus:outline-none"
+            className="min-h-25 rounded-xl border app-border app-panel px-3 py-2 text-sm text-primary focus:border-(--accent) focus:outline-none"
             value={description}
             onChange={(event) => onChange("description", event.target.value)}
           />
@@ -114,7 +114,7 @@ export default function ToolForm({
         <label className="grid gap-2 text-sm text-muted">
           Как се използва
           <textarea
-            className="min-h-[120px] rounded-xl border app-border app-panel px-3 py-2 text-sm text-primary focus:border-[color:var(--accent)] focus:outline-none"
+            className="min-h-30 rounded-xl border app-border app-panel px-3 py-2 text-sm text-primary focus:border-(--accent) focus:outline-none"
             value={howToUse}
             onChange={(event) => onChange("howToUse", event.target.value)}
           />
@@ -122,7 +122,7 @@ export default function ToolForm({
         <label className="grid gap-2 text-sm text-muted lg:col-span-2">
           Реални примери (по един линк на ред)
           <textarea
-            className="min-h-[80px] rounded-xl border app-border app-panel px-3 py-2 text-sm text-primary focus:border-[color:var(--accent)] focus:outline-none"
+            className="min-h-20 rounded-xl border app-border app-panel px-3 py-2 text-sm text-primary focus:border-(--accent) focus:outline-none"
             value={examples}
             onChange={(event) => onChange("examples", event.target.value)}
           />
@@ -149,7 +149,7 @@ export default function ToolForm({
             ))}
           </div>
           <input
-            className="mt-3 w-full rounded-xl border app-border app-panel px-3 py-2 text-sm text-primary focus:border-[color:var(--accent)] focus:outline-none"
+            className="mt-3 w-full rounded-xl border app-border app-panel px-3 py-2 text-sm text-primary focus:border-(--accent) focus:outline-none"
             placeholder="Нова категория (по избор)"
             value={newCategory}
             onChange={(event) => onChange("newCategory", event.target.value)}
@@ -195,7 +195,7 @@ export default function ToolForm({
             ))}
           </div>
           <input
-            className="mt-3 w-full rounded-xl border app-border app-panel px-3 py-2 text-sm text-primary focus:border-[color:var(--accent)] focus:outline-none"
+            className="mt-3 w-full rounded-xl border app-border app-panel px-3 py-2 text-sm text-primary focus:border-(--accent) focus:outline-none"
             placeholder="Нови тагове (разделени със запетая)"
             value={newTags}
             onChange={(event) => onChange("newTags", event.target.value)}
@@ -205,7 +205,7 @@ export default function ToolForm({
 
       <div className="mt-6 flex flex-wrap gap-3">
         <button
-          className="rounded-full accent-bg px-5 py-2 text-sm font-semibold text-slate-900 transition hover:bg-[color:color-mix(in_oklab,var(--accent)_85%,white)]"
+          className="rounded-full accent-bg px-5 py-2 text-sm font-semibold text-slate-900 transition hover:bg-[color-mix(in_oklab,var(--accent)_85%,white)]"
           type="button"
           onClick={onSubmit}
         >

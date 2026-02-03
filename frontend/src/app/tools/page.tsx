@@ -64,21 +64,13 @@ export default function ToolsPage() {
   const [toasts, setToasts] = useState<
     { id: string; message: string; tone: "success" | "error" }[]
   >([]);
-  const userId = user?.id ?? null;
-
   useEffect(() => {
-    if (!user) {
-      setTools([]);
-      setRoles([]);
-      setCategories([]);
-      setTags([]);
-      return;
-    }
+    if (!user) return;
     fetchTools().then(setTools).catch(() => setTools([]));
     fetchRoles().then(setRoles).catch(() => setRoles([]));
     fetchCategories().then(setCategories).catch(() => setCategories([]));
     fetchTags().then(setTags).catch(() => setTags([]));
-  }, [userId]);
+  }, [user]);
 
   const applyFilters = () => {
     fetchTools(filters).then(setTools).catch(() => setTools([]));
@@ -227,6 +219,10 @@ export default function ToolsPage() {
         isAuthenticated={Boolean(user)}
         onLogout={() => {
           logout();
+          setTools([]);
+          setRoles([]);
+          setCategories([]);
+          setTags([]);
           router.replace("/");
         }}
         userName={user?.name}
@@ -272,7 +268,7 @@ export default function ToolsPage() {
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   type="button"
-                  className="rounded-full accent-border accent-soft px-4 py-2 text-sm accent-text transition hover:border-[color:var(--accent)]"
+                  className="rounded-full accent-border accent-soft px-4 py-2 text-sm accent-text transition hover:border-(--accent)"
                   onClick={() => {
                     resetForm();
                     setEditingToolId(null);
@@ -387,7 +383,7 @@ export default function ToolsPage() {
             ) : null}
 
             {pendingDelete ? (
-              <div className="fixed inset-0 z-[55] flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
+              <div className="fixed inset-0 z-55 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
                 <div className="w-full max-w-md rounded-3xl border app-border app-surface p-6 shadow-2xl">
                   <h3 className="text-lg font-semibold text-primary">
                     Потвърди изтриване
@@ -472,11 +468,11 @@ export default function ToolsPage() {
         )}
       </main>
 
-      <div className="pointer-events-none fixed bottom-6 right-6 z-[60] flex flex-col gap-3">
+      <div className="pointer-events-none fixed bottom-6 right-6 z-60 flex flex-col gap-3">
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`pointer-events-auto w-[280px] rounded-2xl border px-4 py-3 text-sm shadow-xl ${
+            className={`pointer-events-auto w-70 rounded-2xl border px-4 py-3 text-sm shadow-xl ${
               toast.tone === "success"
                 ? "accent-border accent-soft accent-text"
                 : "border-rose-400/50 bg-rose-400/10 text-rose-200"

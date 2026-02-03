@@ -100,13 +100,12 @@ export default function AppHeader({
             </button>
             <div className="relative" ref={menuRef}>
               <button
-                className="flex h-10 w-10 items-center justify-center rounded-full border app-border app-panel text-xs font-semibold text-primary transition hover:border-[color:var(--accent)]"
+                className="flex h-10 w-10 items-center justify-center rounded-full border app-border app-panel text-xs font-semibold text-primary transition hover:border-(--accent)"
                 type="button"
                 aria-haspopup="menu"
                 aria-expanded={isProfileOpen}
                 onClick={() => {
                   setIsProfileOpen((prev) => !prev);
-                  setIsSectionsOpen(false);
                 }}
               >
                 {initials}

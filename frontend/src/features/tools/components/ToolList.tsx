@@ -60,7 +60,7 @@ export default function ToolList({
                 <div className="flex items-center gap-2 text-xs">
                   {tool.link ? (
                     <a
-                      className="accent-text hover:text-[color:var(--accent)]"
+                      className="accent-text hover:text-(--accent)"
                       href={tool.link}
                       target="_blank"
                       rel="noreferrer"

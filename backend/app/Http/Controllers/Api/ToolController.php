@@ -14,7 +14,6 @@ use App\Models\ToolRole;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -97,15 +96,6 @@ class ToolController extends Controller
         return response()->json($tools);
     }
 
-    public function count(): JsonResponse
-    {
-        $count = Cache::remember('tools.count', 300, function () {
-            return Tool::query()->count();
-        });
-
-        return response()->json(['count' => $count]);
-    }
-
     public function show(Request $request, Tool $tool): JsonResponse
     {
         $tool->load(['categories', 'tags', 'roleAssignments', 'creator']);
@@ -163,8 +153,6 @@ class ToolController extends Controller
             'created_by' => Auth::id(),
             'status' => 'pending',
         ]);
-
-        Cache::forget('tools.count');
 
         $categoryIds = $data['category_ids'] ?? [];
         if (!empty($data['new_category'])) {
@@ -303,8 +291,6 @@ class ToolController extends Controller
         ], $request);
 
         $tool->delete();
-
-        Cache::forget('tools.count');
 
         return response()->json(['status' => 'deleted']);
     }

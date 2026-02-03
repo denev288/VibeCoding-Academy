@@ -51,7 +51,6 @@ Route::get('/tags', [TagController::class, 'index']);
 Route::post('/tags', [TagController::class, 'store'])->middleware('auth:sanctum');
 
 Route::get('/tools', [ToolController::class, 'index'])->middleware('auth:sanctum');
-Route::get('/tools/count', [ToolController::class, 'count'])->middleware('auth:sanctum');
 Route::get('/tools/{tool}', [ToolController::class, 'show'])->middleware('auth:sanctum');
 Route::post('/tools', [ToolController::class, 'store'])->middleware('auth:sanctum');
 Route::put('/tools/{tool}', [ToolController::class, 'update'])->middleware('auth:sanctum');
