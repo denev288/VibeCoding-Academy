@@ -1,9 +1,25 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: vibecode_postgres
+    environment:
+      POSTGRES_DB: vibecode
+      POSTGRES_USER: vibecode
+      POSTGRES_PASSWORD: vibecode
+    ports:
+      - "8202:5432"
+    volumes:
+      - vibecode_pgdata:/var/lib/postgresql/data
+    networks:
+      - vibecode
+
   php_fpm:
     build:
       context: ./docker/php
     container_name: vibecode_php_fpm
     working_dir: /var/www/html
+    depends_on:
+      - postgres
     volumes:
       - ./backend:/var/www/html
     environment:
@@ -57,3 +73,6 @@ services:
 networks:
   vibecode:
     driver: bridge
+
+volumes:
+  vibecode_pgdata:

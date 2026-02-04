@@ -32,10 +32,10 @@ LOGIN_RES=$(curl -sS -i -b "$COOKIE_JAR" -c "$COOKIE_JAR" \
   -H "Origin: http://localhost:8200" \
   -H "Referer: http://localhost:8200" \
   -H "X-XSRF-TOKEN: $XSRF_DECODED" \
-  -X POST "$API_BASE/login" \
+  -X POST "$API_BASE/api/login" \
   -d "{\"email\":\"$EMAIL\",\"password\":\"$PASSWORD\"}")
 
-if echo "$LOGIN_RES" | grep -q "HTTP/1.1 204"; then
+if echo "$LOGIN_RES" | grep -q "HTTP/1.1 204" || echo "$LOGIN_RES" | grep -q "HTTP/1.1 200"; then
   printf "ok\n"
 else
   printf "failed\n"

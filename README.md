@@ -6,7 +6,7 @@ Laravel + Next.js приложение за управление на AI инс�
 
 - Backend: Laravel 10+ (PHP 8.2), Nginx
 - Frontend: Next.js (React + TS)
-- DB: PostgreSQL (Supabase)
+- DB: PostgreSQL (local Docker or Supabase)
 - Cache: Redis
 - Mail: Mailpit (локално)
 - Auth: Laravel Sanctum (session cookie)
@@ -29,11 +29,28 @@ Laravel + Next.js приложение за управление на AI инс�
 - Backend: http://localhost:8201
 - API status: http://localhost:8201/api/status
 - Mailpit UI: http://localhost:8025
+- Postgres: localhost:8202
 
 Стоп:
 
 ```bash
 ./stop.sh
+```
+
+## Локална PostgreSQL (препоръчително за dev)
+
+1) Копирай локалния env:
+
+```bash
+cp backend/.env.local.example backend/.env
+```
+
+Ако `backend/.env` липсва, `./start.sh` ще го създаде автоматично от локалния пример.
+
+2) Пусни миграции + seed:
+
+```bash
+docker compose exec php_fpm php artisan migrate --seed
 ```
 
 ## Supabase (PostgreSQL) настройка
@@ -258,4 +275,10 @@ templates/ # Post-install templates
   Пусни миграции:
   ```bash
   docker compose exec php_fpm php artisan migrate
+  ```
+
+- **Permission denied за storage/**  
+  Увери се, че директориите съществуват и са writable:
+  ```bash
+  docker compose exec php_fpm sh -lc "mkdir -p storage/logs storage/framework/cache/data storage/framework/sessions storage/framework/views && chmod -R 777 storage bootstrap/cache"
   ```
