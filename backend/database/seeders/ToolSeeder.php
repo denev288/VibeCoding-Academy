@@ -11,7 +11,6 @@ use App\Models\Tool;
 use App\Models\ToolRole;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class ToolSeeder extends Seeder
 {
@@ -26,8 +25,8 @@ class ToolSeeder extends Seeder
         $tools = [
             [
                 'name' => 'Sprint Planner',
-                'description' => 'Планиране на спринтове с цели, риск и dependency карта.',
-                'how_to_use' => 'Създай спринт, добави цели и маркирай зависимости.',
+                'description' => 'Планиране на спринтове с цели, риск и зависимости.',
+                'how_to_use' => 'Създай спринт, добави цели и екип.',
                 'difficulty' => 'easy',
                 'status' => 'approved',
                 'roles' => [Role::PM, Role::OWNER],
@@ -37,8 +36,8 @@ class ToolSeeder extends Seeder
             ],
             [
                 'name' => 'QA Checklist Builder',
-                'description' => 'Генерира чеклист за тестове на база модул и риск.',
-                'how_to_use' => 'Избери модул, добави риск ниво и генерирай.',
+                'description' => 'Генерира чеклист за тестове.',
+                'how_to_use' => 'Избери модул и стартирай.',
                 'difficulty' => 'easy',
                 'status' => 'approved',
                 'roles' => [Role::QA, Role::OWNER],
@@ -48,8 +47,8 @@ class ToolSeeder extends Seeder
             ],
             [
                 'name' => 'API Contract Mapper',
-                'description' => 'Синхронизира API контракти между бекенд и фронтенд.',
-                'how_to_use' => 'Качи OpenAPI и сравни със frontend payloads.',
+                'description' => 'Синхронизира API контракти.',
+                'how_to_use' => 'Качи OpenAPI и сравни.',
                 'difficulty' => 'medium',
                 'status' => 'approved',
                 'roles' => [Role::BACKEND, Role::FRONTEND, Role::OWNER],
@@ -59,8 +58,8 @@ class ToolSeeder extends Seeder
             ],
             [
                 'name' => 'UX Flow Visualizer',
-                'description' => 'Визуализира потребителски flow‑ове и критични точки.',
-                'how_to_use' => 'Добави стъпки и отбележи критични екрани.',
+                'description' => 'Визуализира UX flow‑ове.',
+                'how_to_use' => 'Добави стъпки и критични точки.',
                 'difficulty' => 'easy',
                 'status' => 'approved',
                 'roles' => [Role::DESIGNER, Role::PM, Role::OWNER],
@@ -70,8 +69,8 @@ class ToolSeeder extends Seeder
             ],
             [
                 'name' => 'Release Notes Generator',
-                'description' => 'Автоматично събира промени и генерира release notes.',
-                'how_to_use' => 'Маркирай PR-и и избери версия.',
+                'description' => 'Генерира release notes от промени.',
+                'how_to_use' => 'Маркирай PR-и и версия.',
                 'difficulty' => 'medium',
                 'status' => 'approved',
                 'roles' => [Role::PM, Role::QA, Role::OWNER],
@@ -81,8 +80,8 @@ class ToolSeeder extends Seeder
             ],
             [
                 'name' => 'Perf Budget Tracker',
-                'description' => 'Следи performance budget и алармира при регрес.',
-                'how_to_use' => 'Задай лимити и добави metrics.',
+                'description' => 'Следи performance budget.',
+                'how_to_use' => 'Задай лимити и метрики.',
                 'difficulty' => 'medium',
                 'status' => 'approved',
                 'roles' => [Role::FRONTEND, Role::QA, Role::OWNER],
@@ -92,8 +91,8 @@ class ToolSeeder extends Seeder
             ],
             [
                 'name' => 'Schema Diff Watcher',
-                'description' => 'Следи промени в schema и уведомява екипа.',
-                'how_to_use' => 'Посочи база и schedule за diff.',
+                'description' => 'Следи промени в schema.',
+                'how_to_use' => 'Посочи база и график.',
                 'difficulty' => 'medium',
                 'status' => 'approved',
                 'roles' => [Role::BACKEND, Role::OWNER],
@@ -103,7 +102,7 @@ class ToolSeeder extends Seeder
             ],
             [
                 'name' => 'Test Data Synthesizer',
-                'description' => 'Генерира синтетични данни за QA сценарии.',
+                'description' => 'Генерира тестови данни.',
                 'how_to_use' => 'Избери сценарий и обем.',
                 'difficulty' => 'easy',
                 'status' => 'approved',
@@ -114,8 +113,8 @@ class ToolSeeder extends Seeder
             ],
             [
                 'name' => 'Design Token Sync',
-                'description' => 'Синхронизира дизайн токени към codebase.',
-                'how_to_use' => 'Импортирай Figma tokens и генерирай JSON.',
+                'description' => 'Синхронизира дизайн токени.',
+                'how_to_use' => 'Импортирай tokens и генерирай JSON.',
                 'difficulty' => 'medium',
                 'status' => 'approved',
                 'roles' => [Role::DESIGNER, Role::FRONTEND, Role::OWNER],
@@ -125,7 +124,7 @@ class ToolSeeder extends Seeder
             ],
             [
                 'name' => 'Risk Matrix Builder',
-                'description' => 'Матрица риск/влияние за PM решения.',
+                'description' => 'Матрица риск/влияние.',
                 'how_to_use' => 'Добави елементи и риск ниво.',
                 'difficulty' => 'easy',
                 'status' => 'approved',
@@ -136,8 +135,8 @@ class ToolSeeder extends Seeder
             ],
             [
                 'name' => 'Security Checklist',
-                'description' => 'Checklist за базови security проверки.',
-                'how_to_use' => 'Избери среда и стартирай проверка.',
+                'description' => 'Checklist за security проверки.',
+                'how_to_use' => 'Избери среда и стартирай.',
                 'difficulty' => 'easy',
                 'status' => 'approved',
                 'roles' => [Role::BACKEND, Role::QA, Role::OWNER],
@@ -147,7 +146,7 @@ class ToolSeeder extends Seeder
             ],
             [
                 'name' => 'Spec Reviewer',
-                'description' => 'Преглед на спецификация спрямо acceptance criteria.',
+                'description' => 'Преглед на спецификация.',
                 'how_to_use' => 'Добави spec и критерии.',
                 'difficulty' => 'easy',
                 'status' => 'approved',
@@ -169,7 +168,7 @@ class ToolSeeder extends Seeder
             ],
             [
                 'name' => 'Stakeholder Update',
-                'description' => 'Автоматичен седмичен статус ъпдейт.',
+                'description' => 'Седмичен статус ъпдейт.',
                 'how_to_use' => 'Избери проект и период.',
                 'difficulty' => 'easy',
                 'status' => 'approved',
@@ -180,8 +179,8 @@ class ToolSeeder extends Seeder
             ],
             [
                 'name' => 'API Regression Watch',
-                'description' => 'Следи API регресии с snapshot сравнение.',
-                'how_to_use' => 'Импортирай baseline и пусни сравнение.',
+                'description' => 'Следи API регресии.',
+                'how_to_use' => 'Импортирай baseline и сравни.',
                 'difficulty' => 'medium',
                 'status' => 'approved',
                 'roles' => [Role::BACKEND, Role::QA, Role::OWNER],
@@ -199,39 +198,6 @@ class ToolSeeder extends Seeder
                 'categories' => ['Design'],
                 'tags' => ['ui', 'frontend'],
                 'created_by_role' => Role::FRONTEND,
-            ],
-            [
-                'name' => 'Research Summarizer',
-                'description' => 'Резюмира research и извежда ключови изводи.',
-                'how_to_use' => 'Качи документ и избери дължина.',
-                'difficulty' => 'easy',
-                'status' => 'approved',
-                'roles' => [Role::PM, Role::DESIGNER, Role::OWNER],
-                'categories' => ['Research'],
-                'tags' => ['docs'],
-                'created_by_role' => Role::DESIGNER,
-            ],
-            [
-                'name' => 'Backlog Groomer',
-                'description' => 'Помага за приоритизация и чистене на backlog.',
-                'how_to_use' => 'Импортирай backlog и критерии.',
-                'difficulty' => 'medium',
-                'status' => 'approved',
-                'roles' => [Role::PM, Role::OWNER],
-                'categories' => ['Management'],
-                'tags' => ['planning'],
-                'created_by_role' => Role::PM,
-            ],
-            [
-                'name' => 'Visual QA Diff',
-                'description' => 'Сравнява визуални screenshot-и между версии.',
-                'how_to_use' => 'Качи baseline и нови снимки.',
-                'difficulty' => 'medium',
-                'status' => 'approved',
-                'roles' => [Role::QA, Role::DESIGNER, Role::OWNER],
-                'categories' => ['Testing'],
-                'tags' => ['qa', 'ui'],
-                'created_by_role' => Role::QA,
             ],
         ];
 

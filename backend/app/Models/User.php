@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -34,9 +33,4 @@ class User extends Authenticatable
         'password' => 'hashed',
         'role' => Role::class,
     ];
-
-    public function tools(): HasMany
-    {
-        return $this->hasMany(Tool::class, 'created_by');
-    }
 }

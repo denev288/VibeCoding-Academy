@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\Admin\ActivityLogController;
+use App\Http\Controllers\Api\Admin\ToolAdminController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\TagController;
 use App\Http\Controllers\Api\ToolController;
-use App\Http\Controllers\Api\Admin\ToolAdminController;
-use App\Http\Controllers\Api\Admin\ActivityLogController;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
